@@ -10,7 +10,10 @@ module.exports = function nuxtTagManager(_options) {
       gtm_preview: options.env && options.env.gtm_preview || null,
       gtm_cookies_win: options.env && options.env.gtm_cookies_win || 'x'
     },
-    allowDev : false || options.allowDev
+    allowDev : false || options.allowDev,
+    fields: {
+      anonymizeIp: true && ( options.hasOwnProperty('anonymizeIp') ? options.anonymizeIp : true)
+    }
   }
 
   // Don't include when no GTM id is given OR on dev mode
