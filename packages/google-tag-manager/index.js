@@ -9,11 +9,12 @@ module.exports = function nuxtTagManager(_options) {
       gtm_auth: options.env && options.env.gtm_auth || null,
       gtm_preview: options.env && options.env.gtm_preview || null,
       gtm_cookies_win: options.env && options.env.gtm_cookies_win || 'x'
-    }
+    },
+    allowDev : false || options.allowDev
   }
 
   // Don't include when no GTM id is given OR on dev mode
-  if(!currentOptions.id || (this.options.dev && process.env.NODE_ENV !== 'production')) {
+  if(!currentOptions.id || (this.options.dev && !currentOptions.allowDev && process.env.NODE_ENV !== 'production')) {
     return
   }
 
