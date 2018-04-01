@@ -39,3 +39,32 @@ Use `true` to allow GTM tags to fire in development
   scriptURL: '//example.com'
 }
 ```
+
+## Event Handling
+use `$gtmPush` to push custom events / objects to the data layer
+
+example:
+
+```js
+<template>
+  <div class="grid">
+    <div v-for="item in items" :key="item.id" v-on:click="pushDataLayer(item.name)">
+      <img src='item.image'>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: ['items'],
+  methods: {
+    pushDataLayer(item) {
+      this.$gtmPush({
+        event: 'item click',
+        label: item
+      })
+    }
+  }
+}
+</script>
+```

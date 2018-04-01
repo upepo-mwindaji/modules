@@ -10,10 +10,7 @@ module.exports = function nuxtTagManager(_options) {
       gtm_preview: options.env && options.env.gtm_preview || null,
       gtm_cookies_win: options.env && options.env.gtm_cookies_win || 'x'
     },
-    allowDev : false || options.allowDev,
-    fields: {
-      anonymizeIp: true && ( options.hasOwnProperty('anonymizeIp') ? options.anonymizeIp : true)
-    }
+    allowDev : false || options.allowDev
   }
 
   // Don't include when no GTM id is given OR on dev mode
@@ -37,6 +34,19 @@ module.exports = function nuxtTagManager(_options) {
     src: (currentOptions.scriptURL || '//www.googletagmanager.com/gtm.js') + '?' + queryString,
     async: true
   })
+  // Store dataLayer name to head meta field to use for dataLayer push
+  this.options.head.meta.push({
+    name: 'dataLayer', content: currentOptions.layer
+  })
+
+  // push dataLayer event on head change
+  this.options.head.changed = function(newInfo) {
+    let dataLayer = newInfo.meta.find((meta)=>{ return meta.name === 'dataLayer'}).content
+    window[dataLayer].push({
+      event: 'nuxtHeadChange',
+      pageTitle: newInfo.title
+    })
+  }
 
   // Register plugin
   this.addPlugin({src: path.resolve(__dirname, 'plugin.js'), ssr: false, options: currentOptions})
