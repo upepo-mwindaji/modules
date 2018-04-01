@@ -41,14 +41,58 @@ Use `true` to allow GTM tags to fire in development
 ```
 
 ## Event Handling
-use `$gtmPush` to push custom events / objects to the data layer
+- use `$gtmPush(object)` to push custom events / variables object to the data layer
 
 example:
 
 ```js
 <template>
   <div class="grid">
-    <div v-for="item in items" :key="item.id" v-on:click="pushDataLayer(item.name)">
+    <div
+    v-for="item in items"
+    :key="item.id"
+    v-on:click="$gtmPush({'event':'item click', 'item name': item.name})">
+      <img src='item.image'>
+    </div>
+  </div>
+</template>
+```
+
+- use `$gtmStandardEvent(interaction, category, action, label, value)` to push standardized events object to the data layer
+
+  The method accepts a list of arguments in order:  
+  `interaction`: (required boolean) true if this is an interaction, false otherwise  
+  `category`: (required string or null) event category  
+  `action`: (required string or null) event action  
+  `label`: (optional string or null) event label  
+  `value`: (optional number or null) event value  
+
+example:  
+
+  ```js
+  <template>
+    <div class="grid">
+      <div
+      v-for="item in items"
+      :key="item.id"
+      v-on:click="$gtmStandardEvent(true, 'Items', 'Click', item.name, null )">
+        <img src='item.image'>
+      </div>
+    </div>
+  </template>
+  ```  
+
+  The method can also accept an object  
+
+  example:  
+
+```js
+<template>
+  <div class="grid">
+    <div
+    v-for="item in items"
+    :key="item.id"
+    v-on:click="handleClick(item.name)">
       <img src='item.image'>
     </div>
   </div>
@@ -58,9 +102,11 @@ example:
 export default {
   props: ['items'],
   methods: {
-    pushDataLayer(item) {
-      this.$gtmPush({
-        event: 'item click',
+    handleClick: function (item) {
+      this.$gtmStandardEvent({
+        interaction: true
+        category: 'Cards'
+        action: 'Click'
         label: item
       })
     }
