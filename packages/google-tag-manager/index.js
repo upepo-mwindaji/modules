@@ -31,21 +31,29 @@ module.exports = function nuxtTagManager(_options) {
 
   // Add google tag manager script to head
   this.options.head.script.push({
-    src: (currentOptions.scriptURL || '//www.googletagmanager.com/gtm.js') + '?' + queryString,
+    src: (currentOptions.scriptURL || 'https://www.googletagmanager.com/gtm.js') + '?' + queryString,
     async: true
   })
-  // Store dataLayer name to head meta field to use for dataLayer push
-  this.options.head.meta.push({
-    name: 'dataLayer', content: currentOptions.layer
-  })
+
+  // Store options attributes in meta field to use for dataLayer push
+  // this.options.head.meta.push({
+  //   hid: 'GTM-dataLayer', name: 'GTM-dataLayer', content: currentOptions.layer
+  //   hid: 'GTM-container', name: 'GTM-container', content: currentOptions.id
+  // })
 
   // push dataLayer event on head change
   this.options.head.changed = function(newInfo) {
-    let dataLayer = newInfo.meta.find((meta)=>{ return meta.name === 'dataLayer'}).content
-    window[dataLayer].push({
-      event: 'nuxtHeadChange',
-      pageTitle: newInfo.title
-    })
+    let dataLayer = newInfo.meta.find((meta)=>{ return meta.name === 'GTM-dataLayer'}).content
+    let container = newInfo.meta.find((meta)=>{ return meta.name === 'GTM-container'}).content
+    // to debounce the event which can be fired multiple times per page mount
+    let isRouteOpen =  (window.google_tag_manager[container].dataLayer.get('nuxtHeadChange') === 'open')
+    if (isRouteOpen) {
+      window[dataLayer].push({
+        'event': 'nuxtHeadChange',
+        'pageTitle': newInfo.title,
+        'nuxtHeadChange': 'closed'
+      })
+    }
   }
 
   // Register plugin
